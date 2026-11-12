@@ -1,1 +1,583 @@
-<!DOCTYPE html><html lang="zh-HK"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>每日經文刮刮卡</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{background:#07090e;color:white}.luxe-bg{background-color:#07090e;background-image:radial-gradient(circle at 50% 0%, rgba(202,138,4,.22) 0%, transparent 55%)}#scratchCanvas{touch-action:none;cursor:pointer}#confettiCanvas{pointer-events:none;position:fixed;inset:0}.gold-glass{background:rgba(18,22,34,.78);backdrop-filter:blur(16px);border:1px solid rgba(250,204,21,.35)}.gold-gradient-text{background:linear-gradient(135deg,#fff,#fde047,#ca8a04);-webkit-background-clip:text;-webkit-text-fill-color:transparent}</style></head><body class="luxe-bg min-h-screen flex flex-col items-center"><canvas id="confettiCanvas"></canvas><div class="max-w-md w-full p-4"><div class="text-center my-4"><img class="h-12 mx-auto" src="https://static.wixstatic.com/media/a6bf68_517e552b76364f5a89ba8e87ab4ca217~mv2.png/v1/crop/x_0,y_0,w_601,h_131/fill/w_568,h_124,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/a6bf68_517e552b76364f5a89ba8e87ab4ca217~mv2.png"><h1 class="text-3xl font-bold gold-gradient-text mt-3">每日經文刮刮卡</h1></div><div class="relative gold-glass rounded-3xl p-5 min-h-[560px]"><div id="content" class="text-center flex flex-col gap-4"><div id="verseRef" class="bg-amber-500/20 rounded-xl p-3">約翰福音 14:27</div><div><div class="text-amber-300">今日主題</div><h2 id="title" class="text-2xl">【主所賜的平安】</h2><p id="quote" class="mt-3 bg-black/30 p-3 rounded-xl">我留下平安給你們；我將我的平安賜給你們。</p></div><div id="songBlock" class="bg-black/30 p-3 rounded-xl"><div>🎵 今日詩歌推薦</div><div id="song">讚美之泉 - 平安</div></div></div><canvas id="scratchCanvas" class="absolute inset-0 w-full h-full"></canvas><div id="prompt" class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 px-3 py-1 rounded-full">刮開領受今天的信息</div></div><button onclick="pickCard()" class="mt-4 w-full bg-amber-500 text-black py-3 rounded-xl font-bold">領受另一段經文</button></div><script>const cards=[{ref:'約翰福音 14:27',title:'【主所賜的平安】',quote:'我留下平安給你們；我將我的平安賜給你們。',song:'讚美之泉 - 平安'},{ref:'以賽亞書 40:31',title:'【重新得力】',quote:'但那等候耶和華的，必重新得力。',song:'主你是我力量'},{ref:'箴言 3:5-6',title:'【全心信靠】',quote:'你要專心仰賴耶和華，不可倚靠自己的聰明。',song:'因著信'}];let current=0,isComplete=false;const canvas=document.getElementById('scratchCanvas');const ctx=canvas.getContext('2d',{willReadFrequently:true});function resize(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;if(!isComplete)draw();}function draw(){ctx.globalCompositeOperation='source-over';const g=ctx.createLinearGradient(0,0,canvas.width,canvas.height);g.addColorStop(0,'#ca8a04');g.addColorStop(.5,'#fde047');g.addColorStop(1,'#854d0e');ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#451a03';ctx.font='bold 20px sans-serif';ctx.textAlign='center';ctx.fillText('刮開領受今天的信息',canvas.width/2,canvas.height/2);}resize();window.onresize=resize;let down=false;function scratch(x,y){ctx.globalCompositeOperation='destination-out';ctx.beginPath();ctx.arc(x,y,24,0,Math.PI*2);ctx.fill();check();playScratch();}canvas.onpointerdown=e=>{down=true;scratch(e.offsetX,e.offsetY)};canvas.onpointermove=e=>{if(down)scratch(e.offsetX,e.offsetY)};window.onpointerup=()=>down=false;function check(){const d=ctx.getImageData(0,0,canvas.width,canvas.height).data;let t=0;for(let i=3;i<d.length;i+=16){if(d[i]==0)t++;}if(t/(d.length/16)>.15)reveal();}let audioCtx;try{audioCtx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}function playScratch(){if(!audioCtx)return;const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.frequency.value=180+Math.random()*80;g.gain.value=.01;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.02);}function reveal(){if(isComplete)return;isComplete=true;ctx.clearRect(0,0,canvas.width,canvas.height);document.getElementById('prompt').style.display='none';chime();confetti();}function chime(){if(!audioCtx)return;[523,659,784].forEach((f,i)=>setTimeout(()=>{const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.frequency.value=f;o.connect(g);g.connect(audioCtx.destination);g.gain.value=.08;o.start();o.stop(audioCtx.currentTime+.2)},i*100));}function confetti(){const c=document.getElementById('confettiCanvas'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;let p=Array.from({length:60},()=>({x:c.width/2,y:c.height/2,vx:(Math.random()-.5)*12,vy:(Math.random()-1)*12,a:1}));(function anim(){x.clearRect(0,0,c.width,c.height);let alive=false;p.forEach(o=>{o.x+=o.vx;o.y+=o.vy;o.vy+=.3;o.a-=.02;if(o.a>0){alive=true;x.globalAlpha=o.a;x.fillStyle=['#fde047','#fff','#a855f7'][Math.floor(Math.random()*3)];x.fillRect(o.x,o.y,6,6);}});if(alive)requestAnimationFrame(anim);})();}function pickCard(){current=(current+1)%cards.length;let c=cards[current];verseRef.textContent=c.ref;title.textContent=c.title;quote.textContent=c.quote;song.textContent=c.song;isComplete=false;document.getElementById('prompt').style.display='block';draw();}</script></body></html>
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Christmas Blessing Card</title>
+
+
+
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+
+font-family:'Noto Serif TC',serif;
+
+background:
+linear-gradient(rgba(255,255,255,.92),rgba(255,255,255,.92)),
+url('https://images.unsplash.com/photo-1512389142860-9c449e58a543?q=80&w=1200');
+background-size:cover;
+min-height:100vh;
+padding:20px;
+display:flex;
+justify-content:center;
+}
+
+.container{
+width:100%;
+max-width:800px;
+text-align:center;
+}
+
+.logo{
+max-width:280px;
+width:100%;
+margin-bottom:24px;
+}
+
+.title{
+font-size:28px;
+font-weight:700;
+color:#7d5a00;
+line-height:1.7;
+}
+
+.subtitle{
+margin-top:10px;
+font-size:16px;
+color:#666;
+margin-bottom:30px;
+}
+
+.card{
+position:relative;
+
+width:100%;
+height:430px;
+
+border-radius:30px;
+overflow:hidden;
+
+background:
+linear-gradient(
+135deg,
+#fffdf7,
+#fff6db
+);
+
+box-shadow:
+0 20px 50px
+rgba(0,0,0,.12);
+}
+
+.verse{
+position:absolute;
+
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+padding:40px;
+
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+
+text-align:center;
+}
+
+.zh{
+font-size:24px;
+font-weight:600;
+line-height:1.9;
+color:#463600;
+}
+
+.en{
+margin-top:25px;
+font-size:17px;
+line-height:1.8;
+color:#6d5a1d;
+}
+
+.ref{
+margin-top:25px;
+font-size:18px;
+font-weight:bold;
+color:#9c7500;
+}
+
+#scratchCanvas{
+position:absolute;
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+z-index:50;
+border-radius:30px;
+touch-action:none;
+}
+
+.footer{
+
+margin-top:25px;
+line-height:1.8;
+color:#666;
+}
+
+.reset{
+font-size:12px;
+cursor:pointer;
+text-decoration:underline;
+}
+
+.message{
+font-size:12px;
+margin-top:6px;
+color:#999;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<img
+class="logo"
+src="https://static.wixstatic.com/media/a6bf68_517e552b76364f5a89ba8e87ab4ca217~mv2.png/v1/crop/x_0,y_0,w_601,h_131/fill/w_568,h_124,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/a6bf68_517e552b76364f5a89ba8e87ab4ca217~mv2.png">
+
+<div class="title">
+✨ 我們為您準備了一個特別的聖誕祝福 ✨
+</div>
+
+<div class="subtitle">
+We have a Christmas blessing special for you
+</div>
+
+<div class="card">
+
+<div
+class="verse"
+id="verseContainer">
+
+<div class="zh" id="zhVerse">
+載入中...
+</div>
+
+<div class="en" id="enVerse">
+Loading...
+</div>
+
+<div class="ref" id="verseRef">
+Please wait...
+</div>
+
+</div>
+
+<canvas id="scratchCanvas"></canvas>
+
+</div>
+
+<div class="footer">
+
+
+<div class="message">
+Shepherd International Church | 2026
+</div>
+
+
+<span
+class="reset"
+onclick="resetBlessing()">
+
+重設次序
+
+</span>
+
+
+
+</div>
+
+</div>
+
+<script>
+
+const DEMO_MODE = true;
+
+const GOOGLE_SCRIPT_URL =
+"https://YOUR_SCRIPT_URL";
+
+const DEMO_VERSE = {
+
+zh:
+"你當剛強壯膽！不要懼怕，也不要驚惶；因為你無論往哪裡去，耶和華你的神必與你同在。",
+
+en:
+"Be strong and courageous. Do not be afraid or discouraged, for the Lord your God will be with you wherever you go.",
+
+refZh:
+"約書亞記 1:9",
+
+refEn:
+"Joshua 1:9"
+
+};
+
+async function loadVerse(){
+
+let stored =
+localStorage.getItem(
+"blessingVerse"
+);
+
+if(stored){
+
+const verse =
+JSON.parse(stored);
+
+displayVerse(verse);
+
+return;
+}
+
+if(DEMO_MODE){
+
+localStorage.setItem(
+"blessingVerse",
+JSON.stringify(DEMO_VERSE)
+);
+
+displayVerse(DEMO_VERSE);
+
+return;
+}
+
+try{
+
+const response =
+await fetch(
+GOOGLE_SCRIPT_URL
+);
+
+const verse =
+await response.json();
+
+localStorage.setItem(
+"blessingVerse",
+JSON.stringify(verse)
+);
+
+displayVerse(verse);
+
+}catch(err){
+
+console.error(err);
+
+displayVerse(DEMO_VERSE);
+
+}
+
+}
+
+function displayVerse(data){
+
+document.getElementById(
+"zhVerse"
+).innerText =
+data.zh || data.verseZh;
+
+document.getElementById(
+"enVerse"
+).innerText =
+data.en || data.verseEn;
+
+document.getElementById(
+"verseRef"
+).innerHTML =
+
+(data.refZh || "") +
+"<br>" +
+(data.refEn || "");
+
+}
+
+function resetBlessing(){
+
+let pass =
+prompt("請輸入密碼");
+
+if(pass==="0000"){
+
+localStorage.removeItem(
+"blessingVerse"
+);
+
+alert("已重設");
+
+location.reload();
+
+}else{
+
+alert("密碼錯誤");
+
+}
+
+}
+
+const canvas =
+document.getElementById(
+"scratchCanvas"
+);
+
+const ctx =
+canvas.getContext("2d");
+
+function resizeCanvas(){
+
+const card =
+document.querySelector(".card");
+
+canvas.width =
+card.clientWidth;
+
+canvas.height =
+card.clientHeight;
+
+drawGoldLayer();
+
+}
+
+function drawGoldLayer(){
+
+ctx.clearRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+const gradient =
+ctx.createLinearGradient(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+gradient.addColorStop(
+0,
+"#fff8c8"
+);
+
+gradient.addColorStop(
+0.25,
+"#f9d95d"
+);
+
+gradient.addColorStop(
+0.5,
+"#d4af37"
+);
+
+gradient.addColorStop(
+0.75,
+"#f5cf5f"
+);
+
+gradient.addColorStop(
+1,
+"#fff8d1"
+);
+
+ctx.fillStyle =
+gradient;
+
+ctx.fillRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+ctx.fillStyle =
+"white";
+
+ctx.textAlign =
+"center";
+
+ctx.font =
+"bold 28px serif";
+
+ctx.fillText(
+"用手指抹開金色塗層",
+canvas.width/2,
+canvas.height/2-15
+);
+
+ctx.font =
+"18px serif";
+
+ctx.fillText(
+"Scratch off the gold foil with your finger",
+canvas.width/2,
+canvas.height/2+20
+);
+
+}
+
+resizeCanvas();
+
+window.addEventListener(
+"resize",
+resizeCanvas
+);
+
+let scratching=false;
+
+function scratch(x,y){
+
+ctx.globalCompositeOperation =
+"destination-out";
+
+ctx.beginPath();
+
+ctx.arc(
+x,
+y,
+28,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+checkReveal();
+
+}
+
+function checkReveal(){
+
+const imageData =
+ctx.getImageData(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+const pixels =
+imageData.data;
+
+let transparent = 0;
+
+for(
+let i=3;
+i<pixels.length;
+i+=4
+){
+
+if(
+pixels[i]===0
+){
+transparent++;
+}
+
+}
+
+let percent =
+transparent /
+(canvas.width *
+ canvas.height);
+
+if(percent > 0.40){
+
+canvas.style.transition =
+"0.8s";
+
+canvas.style.opacity =
+"0";
+
+canvas.style.pointerEvents =
+"none";
+
+}
+
+}
+
+canvas.addEventListener(
+"mousedown",
+()=>scratching=true
+);
+
+canvas.addEventListener(
+"mouseup",
+()=>scratching=false
+);
+
+canvas.addEventListener(
+"mousemove",
+(e)=>{
+
+if(!scratching) return;
+
+const r =
+canvas.getBoundingClientRect();
+
+scratch(
+e.clientX-r.left,
+e.clientY-r.top
+);
+
+}
+);
+
+canvas.addEventListener(
+"touchstart",
+()=>{
+scratching=true;
+}
+);
+
+canvas.addEventListener(
+"touchend",
+()=>{
+scratching=false;
+}
+);
+
+canvas.addEventListener(
+"touchmove",
+(e)=>{
+
+const r =
+canvas.getBoundingClientRect();
+
+scratch(
+e.touches[0].clientX-r.left,
+e.touches[0].clientY-r.top
+);
+
+}
+);
+
+loadVerse();
+
+</script>
+
+</body>
+</html>
