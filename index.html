@@ -25,6 +25,8 @@ background:
 linear-gradient(rgba(255,255,255,.92),rgba(255,255,255,.92)),
 url('https://images.unsplash.com/photo-1512389142860-9c449e58a543?q=80&w=1200');
 background-size:cover;
+
+
 min-height:100vh;
 padding:20px;
 display:flex;
@@ -63,24 +65,65 @@ margin-bottom:30px;
 }
 
 .card{
-position:relative;
 
+position:relative;
 width:100%;
 height:460px;
-
 border-radius:30px;
 overflow:hidden;
-
 background:
 linear-gradient(
-135deg,
-#fffdf7,
-#fff1c7
+    135deg,
+    #fffdf7,
+    #fff1c7
 );
 
+border:
+1px solid rgba(212,175,55,.25);
 box-shadow:
-0 20px 50px
-rgba(0,0,0,.12);
+    0 15px 40px rgba(0,0,0,.10),
+    0 0 30px rgba(212,175,55,.15);
+animation:
+    floatCard 4s ease-in-out infinite,
+    glowCard 4s ease-in-out infinite;
+}
+
+@keyframes floatCard{
+
+0%{
+    transform:translateY(0px);
+}
+
+50%{
+    transform:translateY(-6px);
+}
+
+100%{
+    transform:translateY(0px);
+}
+
+}
+
+@keyframes glowCard{
+
+0%{
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.10),
+        0 0 20px rgba(212,175,55,.10);
+}
+
+50%{
+    box-shadow:
+        0 25px 50px rgba(0,0,0,.14),
+        0 0 40px rgba(212,175,55,.25);
+}
+
+100%{
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.10),
+        0 0 20px rgba(212,175,55,.10);
+}
+
 }
 
 .verse{
@@ -234,6 +277,13 @@ translateY(0);
 }
 
 }
+
+@media(max-width:768px){
+.card{
+    height:520px;
+}
+}
+
 
 </style>
 </head>
@@ -405,7 +455,7 @@ document.getElementById(
 if(data.id){
 
 document.getElementById("blessingId").innerHTML =
-    "Blessing #" +
+    "Blessing no. #" +
     String(data.id).padStart(3,"0");
 
 }
@@ -543,6 +593,7 @@ resizeCanvas
 );
 
 let scratching=false;
+let revealed = false;
 
 function scratch(x,y){
 
@@ -552,18 +603,33 @@ ctx.globalCompositeOperation =
 ctx.beginPath();
 
 ctx.arc(
-x,
-y,
-28,
-0,
-Math.PI*2
+    x,
+    y,
+    28,
+    0,
+    Math.PI*2
 );
 
 ctx.fill();
 
+if(!window.sparkleCooldown){
+
+    playMagicSparkle();
+
+    window.sparkleCooldown = true;
+
+    setTimeout(()=>{
+
+        window.sparkleCooldown = false;
+
+    },150);
+
+}
+
 checkReveal();
 
 }
+
 
 function checkReveal(){
 
@@ -599,19 +665,23 @@ transparent /
 (canvas.width *
  canvas.height);
 
- if(percent > 0.20){
+ if(percent > 0.08 && !revealed){
+
+revealed = true;
+
+playRevealSound();
 
 canvas.style.transition =
-"0.8s";
+"opacity 1s ease";
 
-canvas.style.opacity =
-"0";
+canvas.style.opacity = "0";
 
 canvas.style.pointerEvents =
 "none";
 
-document.getElementById("blessingId")
-    .style.opacity = "1";
+document.getElementById(
+   "blessingId"
+).style.opacity = "1";
 
 }
 
@@ -674,6 +744,107 @@ e.touches[0].clientY-r.top
 );
 
 loadVerse();
+
+
+
+
+function playRevealSound(){
+
+const ctx =
+    new (window.AudioContext ||
+    window.webkitAudioContext)();
+
+const notes = [
+    1047,
+    1319,
+    1568,
+    2093
+];
+
+notes.forEach((freq,i)=>{
+
+    const osc =
+        ctx.createOscillator();
+
+    const gain =
+        ctx.createGain();
+
+    osc.type = "sine";
+
+    osc.frequency.value =
+        freq;
+
+    osc.connect(gain);
+
+    gain.connect(
+        ctx.destination
+    );
+
+    gain.gain.setValueAtTime(
+        0.001,
+        ctx.currentTime + i*0.08
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.05,
+        ctx.currentTime + i*0.08 + 0.03
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        ctx.currentTime + i*0.08 + 0.5
+    );
+
+    osc.start(
+        ctx.currentTime + i*0.08
+    );
+
+    osc.stop(
+        ctx.currentTime + i*0.08 + 0.5
+    );
+
+});
+
+}
+
+
+function playMagicSparkle(){
+
+const ctx =
+    new (window.AudioContext ||
+    window.webkitAudioContext)();
+
+const osc =
+    ctx.createOscillator();
+
+const gain =
+    ctx.createGain();
+
+osc.type =
+    "triangle";
+
+osc.frequency.value =
+    2200;
+
+osc.connect(gain);
+
+gain.connect(
+    ctx.destination
+);
+
+gain.gain.value =
+    0.01;
+
+osc.start();
+
+osc.stop(
+    ctx.currentTime + 0.02
+);
+
+}
+
+
+
 
 </script>
 
