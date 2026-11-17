@@ -41,6 +41,11 @@ text-align:center;
 max-width:200px;
 width:100%;
 margin-bottom:20px;
+filter:
+    drop-shadow(
+       0 0 15px
+       rgba(212,175,55,.5)
+    );
 }
 
 .title{
@@ -95,20 +100,24 @@ justify-content:center;
 align-items:center;
 
 text-align:center;
+
+animation:
+fadeInVerse 1s ease;
+
 }
 
 .zh{
-font-size:20px;
-font-weight:500;
+font-size:24px;
+font-weight:600;
 line-height:1.9;
-color:#463600;
+color:#433200;
 }
 
 .en{
-margin-top:25px;
-font-size:18px;
+font-size:15px;
 line-height:1.8;
-color:#6d5a1d;
+color:#75653c;
+font-style:italic;
 }
 
 .ref{
@@ -147,6 +156,83 @@ text-decoration:underline;
 font-size:12px;
 margin-top:6px;
 color:#999;
+}
+
+.blessing-id{
+position:absolute;
+bottom:15px;
+left:50%;
+transform:translateX(-50%);
+font-size:11px;
+color:#c5c5c5;
+letter-spacing:2px;
+z-index:60;
+opacity:0;
+transition:opacity .8s ease;
+}
+
+.snow{
+
+position:fixed;
+inset:0;
+
+pointer-events:none;
+
+opacity:.9;
+
+background-image:
+
+radial-gradient(#ffffff 3px, transparent 3px),
+
+radial-gradient(#d4af37 2px, transparent 2px),
+
+radial-gradient(#ffffff 4px, transparent 4px);
+
+background-size:
+
+180px 180px,
+250px 250px,
+350px 350px;
+
+animation:
+snowFall 18s linear infinite;
+
+}
+
+@keyframes snowFall{
+
+from{
+background-position:
+0 0,
+50px 0;
+}
+
+to{
+background-position:
+0 1000px,
+50px 1000px;
+}
+
+}
+
+@keyframes fadeInVerse{
+
+from{
+
+opacity:0;
+transform:
+translateY(20px);
+
+}
+
+to{
+
+opacity:1;
+transform:
+translateY(0);
+
+}
+
 }
 
 </style>
@@ -189,6 +275,8 @@ Please wait...
 </div>
 
 </div>
+
+<div class="blessing-id" id="blessingId"></div>
 
 <canvas id="scratchCanvas"></canvas>
 
@@ -310,11 +398,17 @@ data.en || data.verseEn;
 document.getElementById(
 "verseRef"
 ).innerHTML =
-
 (data.refZh || "") +
 "<br>" +
 (data.refEn || "");
 
+if(data.id){
+
+document.getElementById("blessingId").innerHTML =
+    "Blessing #" +
+    String(data.id).padStart(3,"0");
+
+}
 }
 
 function resetBlessing(){
@@ -505,7 +599,7 @@ transparent /
 (canvas.width *
  canvas.height);
 
-if(percent > 0.40){
+ if(percent > 0.20){
 
 canvas.style.transition =
 "0.8s";
@@ -515,6 +609,9 @@ canvas.style.opacity =
 
 canvas.style.pointerEvents =
 "none";
+
+document.getElementById("blessingId")
+    .style.opacity = "1";
 
 }
 
@@ -579,6 +676,8 @@ e.touches[0].clientY-r.top
 loadVerse();
 
 </script>
+
+<div class="snow"></div>
 
 </body>
 </html>
