@@ -19,7 +19,7 @@ box-sizing:border-box;
 
 body{
 
-font-family:'Noto Serif TC',serif;
+font-family: sans-serif;
 
 background:
 linear-gradient(rgba(255,255,255,.92),rgba(255,255,255,.92)),
@@ -38,13 +38,13 @@ text-align:center;
 }
 
 .logo{
-max-width:280px;
+max-width:200px;
 width:100%;
-margin-bottom:24px;
+margin-bottom:20px;
 }
 
 .title{
-font-size:28px;
+font-size:26px;
 font-weight:700;
 color:#7d5a00;
 line-height:1.7;
@@ -61,7 +61,7 @@ margin-bottom:30px;
 position:relative;
 
 width:100%;
-height:430px;
+height:460px;
 
 border-radius:30px;
 overflow:hidden;
@@ -70,7 +70,7 @@ background:
 linear-gradient(
 135deg,
 #fffdf7,
-#fff6db
+#fff1c7
 );
 
 box-shadow:
@@ -98,22 +98,22 @@ text-align:center;
 }
 
 .zh{
-font-size:24px;
-font-weight:600;
+font-size:20px;
+font-weight:500;
 line-height:1.9;
 color:#463600;
 }
 
 .en{
 margin-top:25px;
-font-size:17px;
+font-size:18px;
 line-height:1.8;
 color:#6d5a1d;
 }
 
 .ref{
 margin-top:25px;
-font-size:18px;
+font-size:14px;
 font-weight:bold;
 color:#9c7500;
 }
@@ -132,7 +132,6 @@ touch-action:none;
 }
 
 .footer{
-
 margin-top:25px;
 line-height:1.8;
 color:#666;
@@ -162,11 +161,13 @@ class="logo"
 src="https://static.wixstatic.com/media/a6bf68_517e552b76364f5a89ba8e87ab4ca217~mv2.png/v1/crop/x_0,y_0,w_601,h_131/fill/w_568,h_124,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/a6bf68_517e552b76364f5a89ba8e87ab4ca217~mv2.png">
 
 <div class="title">
-✨ 我們為您準備了一個特別的聖誕祝福 ✨
+✨ 為您準備了 ✨
+<br>
+一個特別的聖誕祝福
 </div>
 
 <div class="subtitle">
-We have a Christmas blessing special for you
+A Christmas Blessing Special For You
 </div>
 
 <div class="card">
@@ -217,10 +218,10 @@ onclick="resetBlessing()">
 
 <script>
 
-const DEMO_MODE = true;
+const DEMO_MODE = false;
 
 const GOOGLE_SCRIPT_URL =
-"https://YOUR_SCRIPT_URL";
+"https://script.google.com/macros/s/AKfycbym-Tnz-I0fqaQBDwOb7IzVx_0DFmTIbXxid9qGPmqjwFh_LDtBNF2IA4gT2N6wg0CknQ/exec";
 
 const DEMO_VERSE = {
 
@@ -421,7 +422,7 @@ ctx.textAlign =
 "center";
 
 ctx.font =
-"bold 28px serif";
+"bold 24px sans-serif";
 
 ctx.fillText(
 "用手指抹開金色塗層",
@@ -430,10 +431,10 @@ canvas.height/2-15
 );
 
 ctx.font =
-"18px serif";
+"14px sans-serif";
 
 ctx.fillText(
-"Scratch off the gold foil with your finger",
+"scratch off the gold foil with your finger",
 canvas.width/2,
 canvas.height/2+20
 );
