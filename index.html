@@ -317,26 +317,35 @@ document.getElementById(
 
 }
 
-function resetBlessing(){
+async function resetBlessing(){
 
-let pass =
-prompt("請輸入密碼");
+const pass =
+  prompt("請輸入密碼");
 
-if(pass==="0000"){
+if(pass !== "0000"){
 
-localStorage.removeItem(
-"blessingVerse"
-);
-
-alert("已重設");
-
-location.reload();
-
-}else{
-
-alert("密碼錯誤");
+  alert("密碼錯誤");
+  return;
 
 }
+
+await fetch(
+  GOOGLE_SCRIPT_URL,
+  {
+    method:"POST",
+    headers:{
+      "Content-Type":
+      "application/x-www-form-urlencoded"
+    },
+    body:"password=0000"
+  }
+);
+
+localStorage.clear();
+
+alert("已重設至第一節經文");
+
+location.reload();
 
 }
 
