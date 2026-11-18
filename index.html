@@ -40,32 +40,33 @@ text-align:center;
 }
 
 .logo{
-max-width:200px;
-width:100%;
-margin-bottom:20px;
+max-width:160px;
+width:70%;
+margin-bottom:26px;
+
 filter:
-    drop-shadow(
-       0 0 15px
-       rgba(212,175,55,.5)
-    );
+drop-shadow(
+    0 0 8px rgba(212,175,55,.25)
+);
+
 }
 
 .title{
-font-size:26px;
+font-size:30px;
 font-weight:700;
-color:#7d5a00;
-line-height:1.7;
+line-height:1.35;
+color:#6f5200;
+margin-bottom:5px;
 }
 
 .subtitle{
-margin-top:10px;
-font-size:16px;
-color:#666;
+font-size:15px;
+line-height:1.6;
+color:#8a8a8a;
 margin-bottom:30px;
 }
 
 .card{
-
 position:relative;
 width:100%;
 height:460px;
@@ -84,8 +85,8 @@ box-shadow:
     0 15px 40px rgba(0,0,0,.10),
     0 0 30px rgba(212,175,55,.15);
 animation:
-    floatCard 4s ease-in-out infinite,
-    glowCard 4s ease-in-out infinite;
+    floatCard 6s ease-in-out infinite,
+    glowCard 6s ease-in-out infinite;
 }
 
 @keyframes floatCard{
@@ -95,7 +96,7 @@ animation:
 }
 
 50%{
-    transform:translateY(-6px);
+    transform:translateY(-12px);
 }
 
 100%{
@@ -107,21 +108,27 @@ animation:
 @keyframes glowCard{
 
 0%{
+
     box-shadow:
         0 15px 40px rgba(0,0,0,.10),
         0 0 20px rgba(212,175,55,.10);
+
 }
 
 50%{
+
     box-shadow:
-        0 25px 50px rgba(0,0,0,.14),
-        0 0 40px rgba(212,175,55,.25);
+        0 35px 70px rgba(0,0,0,.18),
+        0 0 60px rgba(212,175,55,.35);
+
 }
 
 100%{
+
     box-shadow:
         0 15px 40px rgba(0,0,0,.10),
         0 0 20px rgba(212,175,55,.10);
+
 }
 
 }
@@ -284,6 +291,82 @@ translateY(0);
 }
 }
 
+#particles{
+
+position:fixed;
+
+inset:0;
+
+pointer-events:none;
+
+overflow:hidden;
+
+z-index:999;
+
+}
+
+.particle{
+
+position:absolute;
+
+font-size:18px;
+
+animation:
+    burst 1.5s ease-out forwards;
+
+}
+
+@keyframes burst{
+
+0%{
+
+    opacity:1;
+
+    transform:
+        translate(0,0)
+        scale(1);
+
+}
+
+100%{
+
+    opacity:0;
+
+    transform:
+        translate(
+            var(--x),
+            var(--y)
+        )
+        scale(0.3);
+
+}
+
+}
+
+.reveal{
+
+animation:
+revealBlessing 2s ease-out forwards;
+
+}
+
+@keyframes revealBlessing{
+
+from{
+    clip-path:
+    circle(
+        0% at 50% 50%
+    );
+}
+
+to{
+    clip-path:
+    circle(
+        150% at 50% 50%
+    );
+}
+
+}
 
 </style>
 </head>
@@ -303,7 +386,7 @@ src="https://static.wixstatic.com/media/a6bf68_517e552b76364f5a89ba8e87ab4ca217~
 </div>
 
 <div class="subtitle">
-A Christmas Blessing Special For You
+A Special Christmas Blessing for You
 </div>
 
 <div class="card">
@@ -455,7 +538,7 @@ document.getElementById(
 if(data.id){
 
 document.getElementById("blessingId").innerHTML =
-    "Blessing no. #" +
+    "Card #" +
     String(data.id).padStart(3,"0");
 
 }
@@ -597,6 +680,9 @@ let revealed = false;
 
 function scratch(x,y){
 
+revealX = x;
+revealY = y;
+
 ctx.globalCompositeOperation =
 "destination-out";
 
@@ -665,19 +751,36 @@ transparent /
 (canvas.width *
  canvas.height);
 
- if(percent > 0.20 && !revealed){
+ if(percent > 0.08 && !revealed){
 
 revealed = true;
 
 playRevealSound();
 
+createBlessingBurst();
+
+const verse =
+  document.querySelector(".verse");
+
+verse.style.setProperty(
+  "--rx",
+  revealX + "px"
+);
+
+verse.style.setProperty(
+  "--ry",
+  revealY + "px"
+);
+
+verse.classList.add("reveal");
+
 canvas.style.transition =
-"opacity 1s ease";
+"opacity 2.8s ease";
 
 canvas.style.opacity = "0";
 
 canvas.style.pointerEvents =
-"none";
+  "none";
 
 document.getElementById(
    "blessingId"
@@ -843,12 +946,77 @@ osc.stop(
 
 }
 
+function createBlessingBurst(){
 
+const card =
+canvas.getBoundingClientRect();
 
+const container =
+    document.getElementById(
+        "particles"
+    );
+
+const icons = [
+   "✨",
+   "✨",
+   "⭐",
+   "❅",
+   "❄️",
+   "✦"
+];
+
+for(let i=0;i<12;i++){
+
+    const particle =
+        document.createElement("div");
+
+    particle.className =
+        "particle";
+
+    particle.innerHTML =
+        icons[
+            Math.floor(
+                Math.random() *
+                icons.length
+            )
+        ];
+
+    particle.style.left =
+    (card.left + revealX) + "px";
+
+    particle.style.top =
+    (card.top + revealY) + "px";
+
+    particle.style.setProperty(
+        "--x",
+        (Math.random()*300-150)
+        + "px"
+    );
+
+    particle.style.setProperty(
+        "--y",
+        (Math.random()*300-150)
+        + "px"
+    );
+
+    container.appendChild(
+        particle
+    );
+
+    setTimeout(()=>{
+
+        particle.remove();
+
+    },1500);
+
+}
+
+}
 
 </script>
 
 <div class="snow"></div>
+<div id="particles"></div>
 
 </body>
 </html>
